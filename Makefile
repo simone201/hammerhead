@@ -368,10 +368,11 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
-NEAK_FLAGS   = -march=armv7-a -mtune=cortex-a15 -mfpu=neon \
+NEAK_FLAGS   = -march=armv7-a -mtune=cortex-a15 -mfpu=neon-vfpv4 \
+			   -munaligned-access \
 			   -fgraphite-identity -fsched-spec-load \
 			   -floop-interchange -floop-strip-mine -floop-block \
-			   -ffast-math -ftree-vectorize -funsafe-math-optimizations \
+			   -ffast-math -ftree-vectorize \
 			   -funswitch-loops -fpredictive-commoning -fgcse-after-reload \
 			   -fmodulo-sched -fmodulo-sched-allow-regmoves \
 			   -fipa-cp-clone -pipe \
