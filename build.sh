@@ -9,7 +9,7 @@ TOOLCHAIN="/home/simone/android-toolchain-eabi-4.7/bin/arm-eabi-"
 ROOTFS_PATH=$1
 
 # Exports
-export KBUILD_BUILD_VERSION="N.E.A.K-N5-1.0x"
+export KERNEL_VERSION="N.E.A.K-N5-1.0x"
 export KERNELDIR=$KERNEL_PATH
 
 # Compile
@@ -19,8 +19,8 @@ make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAI
 make -j`grep 'processor' /proc/cpuinfo | wc -l` ARCH=arm CROSS_COMPILE=$TOOLCHAIN || exit -1
 
 # Copy Kernel Image
-rm -f $KERNEL_PATH/releasetools/tar/$KBUILD_BUILD_VERSION.tar
-rm -f $KERNEL_PATH/releasetools/zip/$KBUILD_BUILD_VERSION.zip
+rm -f $KERNEL_PATH/releasetools/tar/$KERNEL_VERSION.tar
+rm -f $KERNEL_PATH/releasetools/zip/$KERNEL_VERSION.zip
 cp -f $KERNEL_PATH/arch/arm/boot/zImage-dtb .
 
 # Create ramdisk.cpio archive
@@ -37,9 +37,9 @@ cp boot.img $KERNEL_PATH/releasetools
 
 # Creating flashable zip and renaming boot.img
 cd $KERNEL_PATH/releasetools/zip
-zip -0 -r $KBUILD_BUILD_VERSION.zip *
+zip -0 -r $KERNEL_VERSION.zip *
 cd ..
-mv boot.img $KBUILD_BUILD_VERSION.img
+mv boot.img $KERNEL_VERSION.img
 
 # Cleanup
 rm $KERNEL_PATH/releasetools/zip/boot.img
