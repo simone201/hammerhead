@@ -1,0 +1,17 @@
+ui_print(" ");
+ui_print("* Welcome to NEAK N5 Kernel! *");
+ui_print(" ");
+show_progress(0.100000, 0);
+show_progress(0.100000, 40);
+
+ui_print("* Flashing NEAK N5 kernel *");
+
+assert(show_progress(0.100000, 70),
+package_extract_file("boot.img", "/dev/block/platform/msm_sdcc.1/by-name/boot"),
+show_progress(0.100000, 90));
+
+show_progress(0.100000, 100);
+ui_print(" ");
+ui_print(" ");
+ui_print("  * Installation Completed *");
+ui_print("  * Enjoy *");
