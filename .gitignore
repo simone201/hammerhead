@@ -39,7 +39,7 @@ modules.builtin
 *.orig
 *zImage
 *Image
-boot.img
+*.img
 ramdisk.cpio
 vmlinux.lds
 vmlinux
