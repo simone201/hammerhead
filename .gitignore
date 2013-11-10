@@ -122,4 +122,3 @@ arch/arm/boot/compressed/piggy.xzkern
 *~
 \#*#
 arch/arm/mach-msm/smd_rpc_sym.c
-boot.img
