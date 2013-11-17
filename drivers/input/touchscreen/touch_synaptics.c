@@ -38,6 +38,13 @@
 
 #include "SynaImage.h"
 
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+#include <linux/input/sweep2wake.h>
+#endif
+
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 static struct workqueue_struct *synaptics_wq;
 
 /* RMI4 spec from 511-000405-01 Rev.D
@@ -470,6 +477,15 @@ static void touch_fw_upgrade_func(struct work_struct *work_fw_upgrade)
 
 	if (ts->curr_pwr_state == POWER_ON) {
 		disable_irq(ts->client->irq);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+		if (irq_wake) {
+			irq_wake = false;
+			disable_irq_wake(ts->client->irq);
+		}
+#endif
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 	}
 	else {
 		touch_power_cntl(ts, POWER_ON);
@@ -488,6 +504,15 @@ static void touch_fw_upgrade_func(struct work_struct *work_fw_upgrade)
 	}
 	else {
 		enable_irq(ts->client->irq);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+		if (!irq_wake) {
+			irq_wake = true;
+			enable_irq_wake(ts->client->irq);
+		}
+#endif
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 
 		touch_ic_init(ts);
 
@@ -517,6 +542,15 @@ static void touch_init_func(struct work_struct *work_init)
 	TOUCH_DEBUG_TRACE("%s\n", __func__);
 
 	enable_irq(ts->client->irq);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+	if (!irq_wake) {
+		irq_wake = true;
+		enable_irq_wake(ts->client->irq);
+	}
+#endif
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 
 	/* Specific device initialization */
 	touch_ic_init(ts);
@@ -534,8 +568,25 @@ static void touch_recover_func(struct work_struct *work_recover)
 				struct synaptics_ts_data, work_recover);
 
 	disable_irq(ts->client->irq);
+<<<<<<< HEAD
 	safety_reset(ts);
 	enable_irq(ts->client->irq);
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+	if (irq_wake) {
+		irq_wake = false;
+		disable_irq_wake(ts->client->irq);
+	}
+#endif
+	safety_reset(ts);
+	enable_irq(ts->client->irq);
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+	if (!irq_wake) {
+		irq_wake = true;
+		enable_irq_wake(ts->client->irq);
+	}
+#endif
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 	touch_ic_init(ts);
 }
 
@@ -579,6 +630,15 @@ static int touch_ic_init(struct synaptics_ts_data *ts)
 err_out_retry:
 	ts->ic_init_err_cnt++;
 	disable_irq_nosync(ts->client->irq);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+	if (irq_wake) {
+		irq_wake = false;
+		disable_irq_wake(ts->client->irq);
+	}
+#endif
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 	safety_reset(ts);
 	queue_delayed_work(synaptics_wq, &ts->work_init, msecs_to_jiffies(10));
 
@@ -1455,6 +1515,15 @@ static ssize_t store_ts_reset(struct device *dev,
 	sscanf(buf, "%s", string);
 
 	disable_irq_nosync(ts->client->irq);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+	if (irq_wake) {
+		irq_wake = false;
+		disable_irq_wake(ts->client->irq);
+	}
+#endif
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 
 	cancel_delayed_work_sync(&ts->work_init);
 
@@ -1489,6 +1558,15 @@ static ssize_t store_ts_reset(struct device *dev,
 	}
 
 	enable_irq(ts->client->irq);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+	if (!irq_wake) {
+		irq_wake = true;
+		enable_irq_wake(ts->client->irq);
+	}
+#endif
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 
 	if (saved_state == POWER_ON || saved_state == POWER_WAKE)
 		touch_ic_init(ts);
@@ -1614,7 +1692,14 @@ static int synaptics_ts_stop(struct synaptics_ts_data *ts)
 	if (!ts->curr_resume_state) {
 		return 0;
 	}
+<<<<<<< HEAD
 
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+	if (s2w_switch == 0)
+#endif
+	{
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 	ts->curr_resume_state = 0;
 
 	if (ts->fw_info.fw_upgrade.is_downloading == UNDER_DOWNLOADING) {
@@ -1776,7 +1861,15 @@ static int synaptics_ts_probe(
 	gpio_direction_input(ts->pdata->irq_gpio);
 
 	ret = request_threaded_irq(client->irq, NULL, touch_irq_handler,
+<<<<<<< HEAD
 			IRQF_TRIGGER_FALLING | IRQF_ONESHOT, client->name, ts);
+=======
+#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE_PREVENT_SLEEP
+			IRQF_TRIGGER_FALLING | IRQF_ONESHOT | IRQF_NO_SUSPEND, client->name, ts);
+#else
+			IRQF_TRIGGER_FALLING | IRQF_ONESHOT, client->name, ts);
+#endif
+>>>>>>> e1e697c... sweep2wake: massive update, bring on par with s2w2 except algorithm
 
 	if (ret < 0) {
 		TOUCH_ERR_MSG("request_irq failed. use polling mode\n");
