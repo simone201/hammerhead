@@ -122,3 +122,10 @@ arch/arm/boot/compressed/piggy.xzkern
 *~
 \#*#
 arch/arm/mach-msm/smd_rpc_sym.c
+<<<<<<< HEAD
+=======
+boot.img
+build.sh
+flash.sh
+zip/
+>>>>>>> franco/android-msm-hammerhead-3.4-kk-r1
