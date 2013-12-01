@@ -368,7 +368,7 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
-NEAK_FLAGS   = -march=armv7-a -mtune=cortex-a15 -mfpu=neon-vfpv4 \
+NEAK_FLAGS   = -mcpu=cortex-a15 -mfpu=neon-vfpv4 \
 			   -munaligned-access \
 			   -fgraphite-identity -fsched-spec-load \
 			   -floop-interchange -floop-strip-mine -floop-block \
@@ -382,7 +382,6 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-		   -Wno-sizeof-pointer-memaccess \
 		   -fno-delete-null-pointer-checks $(NEAK_FLAGS)
 
 KBUILD_AFLAGS_KERNEL :=
