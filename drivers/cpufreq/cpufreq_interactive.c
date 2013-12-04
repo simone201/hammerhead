@@ -371,15 +371,20 @@ static void cpufreq_interactive_timer(unsigned long data)
 	cpu_load = loadadjfreq / pcpu->target_freq;
 	boosted = now < boostpulse_endtime;
 
-	new_freq = cpu_load * pcpu->max_load_freq_divided;
+	new_freq = choose_freq(pcpu, loadadjfreq);
 
-	if (cpu_load >= go_hispeed_load) {
+	if (cpu_load >= go_hispeed_load) 
+	{
 		if (new_freq < hispeed_freq)
+		{
 			new_freq = hispeed_freq;
-
-		pcpu->hispeed_validate_time = now;
-	} else if (boosted) {
-		new_freq = input_boost_freq; 
+			pcpu->hispeed_validate_time = now;		
+		}
+	} 
+	else if (boosted) 
+	{
+		if (new_freq < input_boost_freq)
+			new_freq = input_boost_freq; 
 	}
 
 	if (pcpu->target_freq >= hispeed_freq &&
@@ -704,15 +709,18 @@ static int thread_migration_notify(struct notifier_block *nb,
 				unsigned long target_cpu, void *arg)
 {
 	unsigned long flags;
+	unsigned int boost_freq = CPU_SYNC_FREQ;
 	struct cpufreq_interactive_cpuinfo *target, *source;
 	target = &per_cpu(cpuinfo, target_cpu);
 	source = &per_cpu(cpuinfo, (int)arg);
 	
-	if ((source->policy->cur > target->policy->cur) & 
-			(target->policy->cur < CPU_SYNC_FREQ))
+	if (source->policy->cur > target->policy->cur)
 	{
-		target->target_freq = CPU_SYNC_FREQ;
-		target->floor_freq = CPU_SYNC_FREQ;
+		if (source->policy->cur < boost_freq)
+			boost_freq = source->policy->cur;
+
+		target->target_freq = boost_freq;
+		target->floor_freq = boost_freq;
 		target->floor_validate_time = ktime_to_us(ktime_get());
 
 		spin_lock_irqsave(&speedchange_cpumask_lock, flags);
