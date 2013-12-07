@@ -338,7 +338,7 @@ static s32 wl_notify_escan_complete(struct wl_priv *wl,
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(3, 2, 0)) || 0
 static s32 wl_cfg80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
 	u8 *peer, enum nl80211_tdls_operation oper);
-#endif /* LINUX_VERSION_CODE > KERNEL_VERSION(3, 2, 0) */
+#endif 
 static int wl_cfg80211_sched_scan_stop(struct wiphy *wiphy, struct net_device *dev);
 
 /*
@@ -10613,7 +10613,6 @@ wl_cfg80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
 #ifdef WLTDLS
 	struct wl_priv *wl = wlcfg_drv_priv;
 	tdls_iovar_t info;
-
 	memset(&info, 0, sizeof(tdls_iovar_t));
 	if (peer)
 		memcpy(&info.ea, peer, ETHER_ADDR_LEN);
