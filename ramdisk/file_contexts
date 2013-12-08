@@ -220,3 +220,10 @@
 #line 1 "device/lge/hammerhead/sepolicy/file_contexts"
 # GPU device
 /dev/kgsl-3d0       u:object_r:gpu_device:s0
+#line 1 "vendor/slim/sepolicy/file_contexts"
+#############################
+# performance-related sysfs files
+/sys/kernel/mm/ksm(/.*)?       --          u:object_r:sysfs_writable:s0
+/sys/devices/system/cpu.*/cpufreq(/.*)? --  u:object_r:sysfs_writable:s0
+/sys/block/mmcblk0/queue/scheduler  --    u:object_r:sysfs_writable:s0
+
