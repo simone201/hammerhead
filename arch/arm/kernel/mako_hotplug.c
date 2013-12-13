@@ -33,6 +33,8 @@
 #define HIGH_LOAD_COUNTER 20
 #define TIMER HZ
 #define GPU_BUSY_THRESHOLD 60
+#define DEFAULT_FIXED_CORES 0
+#define NUM_CORES 4
 
 /*
  * 1000ms = 1 second
@@ -49,6 +51,7 @@ static struct cpu_stats
 	bool ready_to_online[2];
 	struct notifier_block notif;
 	bool gpu_busy_quad_mode;
+	unsigned int fixed_cores;
 } stats = {
 	.default_first_level = DEFAULT_FIRST_LEVEL,
     .suspend_frequency = DEFAULT_SUSPEND_FREQ,
@@ -57,12 +60,15 @@ static struct cpu_stats
 	.timestamp = {0},
 	.ready_to_online = {false},
 	.gpu_busy_quad_mode = false,
+	.fixed_cores = DEFAULT_FIXED_CORES,
 };
 
 struct cpu_load_data {
 	u64 prev_cpu_idle;
 	u64 prev_cpu_wall;
 };
+
+static unsigned int old_fixed_cores = DEFAULT_FIXED_CORES;
 
 static DEFINE_PER_CPU(struct cpu_load_data, cpuload);
 
@@ -149,7 +155,7 @@ static inline void calc_cpu_hotplug(unsigned int counter0,
 static void __ref decide_hotplug_func(struct work_struct *work)
 {
     int cpu;
-	//int i;
+	int i;
 
 	//commented for now
 	/*	
@@ -165,6 +171,41 @@ static void __ref decide_hotplug_func(struct work_struct *work)
 		}
 		goto re_queue;
 	}*/
+
+	/*
+	 * Fixed Core Logic - Simone Renzo (simone201)
+	 * Allows the user to set a fixed amount of online cores
+	 * to gain more power or save a lot of battery by going in single core mode
+	 */
+	if(stats.fixed_cores == 0 && old_fixed_cores != 0) {
+		stats.counter[0] = 0;
+		stats.counter[1] = 0;
+		
+		for_each_possible_cpu(cpu) {
+			if (cpu_is_offline(cpu) && cpu)
+				cpu_up(cpu);
+		}
+		
+		flush_workqueue(wq);
+		cancel_delayed_work(&decide_hotplug);
+		
+		old_fixed_cores = stats.fixed_cores;
+		
+		goto re_queue;
+	} else if(stats.fixed_cores > 0) {
+		for_each_possible_cpu(cpu) {
+			if (cpu_online(cpu) && cpu)
+				cpu_down(cpu);
+		}
+		
+		for(i = 1; i < stats.fixed_cores; i++) {
+			if(cpu_is_offline(i))
+				cpu_up(i);
+		}
+		
+		goto re_queue;
+	}
+	/* END FIXED CORE LOGIC */
 
     for_each_online_cpu(cpu) 
     {
@@ -186,7 +227,7 @@ static void __ref decide_hotplug_func(struct work_struct *work)
 
 	calc_cpu_hotplug(stats.counter[0], stats.counter[1]);
 
-//re_queue:	
+re_queue:	
     queue_delayed_work(wq, &decide_hotplug, msecs_to_jiffies(TIMER));
 }
 
@@ -269,6 +310,12 @@ void update_gpu_busy_quad_mode(unsigned int num)
 	stats.gpu_busy_quad_mode = num;
 }
 
+void update_fixed_cores(unsigned int num)
+{	
+	old_fixed_cores = stats.fixed_cores;
+	stats.fixed_cores = num;
+}
+
 unsigned int get_first_level()
 {
     return stats.default_first_level;
@@ -287,6 +334,11 @@ unsigned int get_cores_on_touch()
 unsigned int get_gpu_busy_quad_mode()
 {
 	return stats.gpu_busy_quad_mode;
+}
+
+unsigned int get_fixed_cores()
+{
+	return stats.fixed_cores;
 }
 
 /* end sysfs functions from external driver */
