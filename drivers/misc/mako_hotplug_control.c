@@ -91,36 +91,15 @@ static ssize_t gpu_busy_quad_mode_store(struct device *dev, struct device_attrib
     return size;
 }
 
-static ssize_t fixed_cores_show(struct device *dev, struct device_attribute *attr, char *buf)
-{
-    return sprintf(buf, "%u\n", get_fixed_cores());
-}
-
-static ssize_t fixed_cores_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
-{
-    unsigned int new_val;
-    
-    sscanf(buf, "%u", &new_val);
-    
-    if (new_val != get_fixed_cores() && new_val >= 0 && new_val <= 4)
-    {
-        update_fixed_cores(new_val);
-    }
-    
-    return size;
-}
-
 static DEVICE_ATTR(first_level, 0664, first_level_show, first_level_store);
 static DEVICE_ATTR(cores_on_touch, 0664, cores_on_touch_show, cores_on_touch_store);
 static DEVICE_ATTR(gpu_busy_quad_mode, 0664, gpu_busy_quad_mode_show, gpu_busy_quad_mode_store);
-static DEVICE_ATTR(fixed_cores, 0664, fixed_cores_show, fixed_cores_store);
 
 static struct attribute *mako_hotplug_control_attributes[] =
 {
 	&dev_attr_first_level.attr,
     &dev_attr_cores_on_touch.attr,
 	&dev_attr_gpu_busy_quad_mode.attr,
-	&dev_attr_fixed_cores.attr,
 	NULL
 };
 
