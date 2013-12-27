@@ -66,10 +66,10 @@ static spinlock_t speedchange_cpumask_lock;
 static struct mutex gov_lock;
 
 /* Hi speed to bump to from lo speed when load burst (default max) */
-static unsigned int hispeed_freq = 1497600;
+static unsigned int hispeed_freq = 1574400;
 
 /* Go to hi speed when CPU load at or above this value. */
-#define DEFAULT_GO_HISPEED_LOAD 90
+#define DEFAULT_GO_HISPEED_LOAD 95
 static unsigned long go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
 
 /* Sampling down factor to be applied to min_sample_time at max freq */
@@ -86,13 +86,13 @@ static int ntarget_loads = ARRAY_SIZE(default_target_loads);
 /*
  * The minimum amount of time to spend at a frequency before we can ramp down.
  */
-#define DEFAULT_MIN_SAMPLE_TIME (40 * USEC_PER_MSEC)
+#define DEFAULT_MIN_SAMPLE_TIME (30 * USEC_PER_MSEC)
 static unsigned long min_sample_time = DEFAULT_MIN_SAMPLE_TIME;
 
 /*
  * The sample rate of the timer used to increase frequency
  */
-#define DEFAULT_TIMER_RATE (30 * USEC_PER_MSEC)
+#define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
 static unsigned long timer_rate = DEFAULT_TIMER_RATE;
 
 /* Busy SDF parameters*/
@@ -102,7 +102,7 @@ static unsigned long timer_rate = DEFAULT_TIMER_RATE;
  * Wait this long before raising speed above hispeed, by default a double
  * timer interval.
  */
-#define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
+#define DEFAULT_ABOVE_HISPEED_DELAY 2 * DEFAULT_TIMER_RATE
 static unsigned int default_above_hispeed_delay[] = {
 	DEFAULT_ABOVE_HISPEED_DELAY };
 static spinlock_t above_hispeed_delay_lock;
@@ -401,28 +401,6 @@ static void cpufreq_interactive_timer(unsigned long data)
 
 	pcpu->prev_load = cpu_load;
 	boosted = now < boostpulse_endtime;
-
-	max_load_other_cpu = 0;
-	max_freq_other_cpu = 0;
-	for_each_online_cpu(i) {
-		struct cpufreq_interactive_cpuinfo *picpu =
-						&per_cpu(cpuinfo, i);
-		if (!down_read_trylock(&picpu->enable_sem))
-			continue;
-		if (!picpu->governor_enabled) {
-			up_read(&picpu->enable_sem);
-			continue;
-		}
-		up_read(&picpu->enable_sem);
-		
-		if (i == data)
-			continue;
-		if (max_load_other_cpu < picpu->prev_load)
-			max_load_other_cpu = picpu->prev_load;
-
-		if (picpu->policy->cur > max_freq_other_cpu)
-			max_freq_other_cpu = picpu->policy->cur;
-	}
 
 	if (cpu_load >= go_hispeed_load)
 	{
