@@ -192,23 +192,12 @@ on post-fs-data
     write /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor "interactive"
     write /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor "interactive"
     write /sys/devices/system/cpu/cpu3/cpufreq/scaling_governor "interactive"
-    #write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 90
-    #write /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate 50000
-    #write /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy 1
-    #write /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor 4
-    #write /sys/devices/system/cpu/cpufreq/ondemand/down_differential 10
-    #write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_multi_core 70
-    #write /sys/devices/system/cpu/cpufreq/ondemand/down_differential_multi_core 3
-    #write /sys/devices/system/cpu/cpufreq/ondemand/optimal_freq 960000
-    #write /sys/devices/system/cpu/cpufreq/ondemand/sync_freq 960000
-    #write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold_any_cpu_load 80
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 300000
     write /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq 300000
     write /sys/devices/system/cpu/cpu2/cpufreq/scaling_min_freq 300000
     write /sys/devices/system/cpu/cpu3/cpufreq/scaling_min_freq 300000
     chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
     chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-    #write /sys/module/msm_thermal/core_control/enabled 1
     chown root.system /sys/devices/system/cpu/mfreq
     chmod 220 /sys/devices/system/cpu/mfreq
     chown root.system /sys/devices/system/cpu/cpu1/online
@@ -217,7 +206,10 @@ on post-fs-data
     chmod 664 /sys/devices/system/cpu/cpu1/online
     chmod 664 /sys/devices/system/cpu/cpu2/online
     chmod 664 /sys/devices/system/cpu/cpu3/online
-    #write /dev/cpuctl/apps/cpu.notify_on_migrate 1
+
+    # Torch
+    chown system camera /sys/class/leds/led:flash_torch/brightness
+    chmod 0666 /sys/class/leds/led:flash_torch/brightness
 
 on charger
     # Booting modem
@@ -227,6 +219,8 @@ on charger
     mount ext4 /dev/block/platform/msm_sdcc.1/by-name/system /system ro barrier=1
     start rmt_storage
     start irsc_util
+
+    # Enable Power modes and set the CPU Freq Sampling rates
 
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
@@ -254,8 +248,10 @@ on property:sys.boot_completed=1
     write /sys/module/pm_8x60/modes/cpu1/retention/idle_enabled 1
     write /sys/module/pm_8x60/modes/cpu2/retention/idle_enabled 1
     write /sys/module/pm_8x60/modes/cpu3/retention/idle_enabled 1
-	start fkbootscript
-    start mpdecision
+    start fkbootscript
+	stop thermal-engine
+	write /dev/cpuctl/apps/cpu.notify_on_migrate 1
+    #start mpdecision
 
 service rmt_storage /system/bin/rmt_storage
     class core
@@ -286,7 +282,7 @@ service irsc_util /system/bin/irsc_util "/etc/sec_config"
     user root
     oneshot
 
-service p2p_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
+service p2p_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
     -I/system/etc/wifi/wpa_supplicant_overlay.conf \
     -O/data/misc/wifi/sockets -N \
@@ -303,7 +299,7 @@ service p2p_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
     disabled
     oneshot
 
-service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
+service wpa_supplicant /system/bin/wpa_supplicant \
     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
     -I/system/etc/wifi/wpa_supplicant_overlay.conf \
     -O/data/misc/wifi/sockets \
@@ -317,12 +313,12 @@ service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant \
     disabled
     oneshot
 
-service dhcpcd_wlan0 /system/bin/dhcpcd -ABKLG
+service dhcpcd_wlan0 /system/bin/dhcpcd -aABDKL
     class late_start
     disabled
     oneshot
 
-service dhcpcd_p2p /system/bin/dhcpcd -ABKLG
+service dhcpcd_p2p /system/bin/dhcpcd -aABKL
     class late_start
     disabled
     oneshot
