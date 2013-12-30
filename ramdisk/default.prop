@@ -8,6 +8,7 @@ persist.radio.snapshot_enabled=1
 persist.radio.snapshot_timer=2
 persist.radio.use_cc_names=true
 persist.sys.usb.config=mtp,adb
+persist.sys.root_access=3
 rild.libpath=/system/lib/libril-qc-qmi-1.so
 camera.disable_zsl_mode=1
 
