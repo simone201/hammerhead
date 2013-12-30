@@ -69,7 +69,7 @@ static struct mutex gov_lock;
 static unsigned int hispeed_freq = 1574400;
 
 /* Go to hi speed when CPU load at or above this value. */
-#define DEFAULT_GO_HISPEED_LOAD 95
+#define DEFAULT_GO_HISPEED_LOAD 90
 static unsigned long go_hispeed_load = DEFAULT_GO_HISPEED_LOAD;
 
 /* Sampling down factor to be applied to min_sample_time at max freq */
@@ -110,7 +110,7 @@ static unsigned int *above_hispeed_delay = default_above_hispeed_delay;
 static int nabove_hispeed_delay = ARRAY_SIZE(default_above_hispeed_delay);
 
 /* 1000ms - 1s */
-#define DEFAULT_BOOSTPULSE_DURATION 250000
+#define DEFAULT_BOOSTPULSE_DURATION 200000
 /* Duration of a boot pulse in usecs */
 static int boostpulse_duration_val = DEFAULT_BOOSTPULSE_DURATION;
 /* End time of boost pulse in ktime converted to usecs */
@@ -129,14 +129,14 @@ static bool io_is_busy = false;
  * The CPU will be boosted to this frequency when the screen is
  * touched. input_boost needs to be enabled.
  */
-#define DEFAULT_INPUT_BOOST_FREQ 1574400
+#define DEFAULT_INPUT_BOOST_FREQ 1497600
 static int input_boost_freq = DEFAULT_INPUT_BOOST_FREQ;
 static struct workqueue_struct *input_wq;
 static struct work_struct input_work;
 #define DEFAULT_BOOSTED_TIME_INTERVAL 100
 unsigned long boosted_time;
 
-#define CPU_SYNC_FREQ 960000
+#define CPU_SYNC_FREQ 1036800
 
 /*
  * If the max load among other CPUs is higher than up_threshold_any_cpu_load
@@ -145,7 +145,7 @@ unsigned long boosted_time;
  * sync_freq
  */
 
-static unsigned int up_threshold_any_cpu_load = 50;
+static unsigned int up_threshold_any_cpu_load = 60;
 static unsigned int sync_freq = CPU_SYNC_FREQ;
 static unsigned int up_threshold_any_cpu_freq = 1728000;
 
