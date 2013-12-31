@@ -127,5 +127,4 @@ build.sh
 flash.sh
 zip/
 diff.diff
-drivers/input/touchscreen/touchboost.c
 touchboost.diff
