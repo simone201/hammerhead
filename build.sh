@@ -9,7 +9,7 @@ TOOLCHAIN="/home/simone/android-toolchain-eabi-4.7/bin/arm-eabi-"
 ROOTFS_PATH=$1
 
 # Exports
-export KERNEL_VERSION="N.E.A.K-N5-0.1x"
+export KERNEL_VERSION="N.E.A.K-N5-0.2x"
 export KERNELDIR=$KERNEL_PATH
 
 # Compile
@@ -29,7 +29,7 @@ find . | cpio -o -H newc > ../ramdisk.cpio
 cd ..
 
 # Make boot.img
-./mkbootimg --base 0 --pagesize 2048 --kernel_offset 0x00008000 --ramdisk_offset 0x02900000 --second_offset 0x00f00000 --tags_offset 0x02700000 --cmdline 'console=ttyHSL0,115200,n8 androidboot.hardware=hammerhead user_debug=31 msm_watchdog_v2.enable=1' --kernel zImage-dtb --ramdisk ramdisk.cpio -o boot.img
+./mkbootimg --base 0 --pagesize 2048 --kernel_offset 0x00008000 --ramdisk_offset 0x02900000 --second_offset 0x00f00000 --tags_offset 0x02700000 --cmdline 'console=ttyHSL0,115200,n8 androidboot.hardware=hammerhead user_debug=31 msm_watchdog_v2.enable=1 selinux=0 apparmor=0' --kernel zImage-dtb --ramdisk ramdisk.cpio -o boot.img
 
 # Copy boot.img
 cp boot.img $KERNEL_PATH/releasetools/zip
