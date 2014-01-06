@@ -12,4 +12,10 @@ if [ ! -e /system/etc/init.d ]; then
   chown -R root.root /system/etc/init.d;
   chmod -R 755 /system/etc/init.d;
 fi;
+
+# B2G
+chmod 0755 /system/b2g/b2g
+chmod 0755 /system/b2g/plugin-container
+chmod 0755 /system/b2g/updater
+
 mount -o ro,remount /system /system;
