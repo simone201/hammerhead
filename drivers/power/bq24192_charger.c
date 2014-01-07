@@ -340,6 +340,7 @@ static int bq24192_set_input_i_limit(struct bq24192_chip *chip, int ma)
 		new_ma = 1200;
 		temp = icl_ma_table[4].value;
 	}
+
 	else
 	{
 		temp = icl_ma_table[i].value;
