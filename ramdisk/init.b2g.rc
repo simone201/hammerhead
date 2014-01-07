@@ -6,6 +6,10 @@ service fakesched /system/bin/fakesched
     class main
     user root
 
+service fakeappops /system/bin/fakeappops
+    class main
+    user root
+
 service b2g /system/bin/b2g.sh
     class main
     onrestart restart media
@@ -15,6 +19,18 @@ service rilproxy /system/bin/rilproxy
     socket rilproxy stream 660 root system
     user root
     group radio
+
+service nfcd /system/bin/nfcd
+    class main
+    oneshot
+    socket nfcd stream 660 nfc nfc
+    user nfc
+    group nfc
+
+service OOMLogger /system/bin/oom-msg-logger
+    class main
+    user root
+    group system
 
 on boot
     exec /system/bin/rm -r /data/local/tmp
