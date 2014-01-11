@@ -13,6 +13,6 @@ rild.libpath=/system/lib/libril-qc-qmi-1.so
 camera.disable_zsl_mode=1
 
 # For NEAK OTA Updater
-ro.kernel.id=Kernel Version-0.2
+ro.kernel.id=Kernel Version-0.3
 # For NEAK Configurator
-ro.neak.version=0.2x
+ro.neak.version=0.3x

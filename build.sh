@@ -9,7 +9,7 @@ TOOLCHAIN="/home/simone/android-toolchain-eabi-4.7/bin/arm-eabi-"
 ROOTFS_PATH=$1
 
 # Exports
-export KERNEL_VERSION="N.E.A.K-N5-0.2x"
+export KERNEL_VERSION="N.E.A.K-N5-0.3x"
 export KERNELDIR=$KERNEL_PATH
 
 # Compile
